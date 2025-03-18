@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Bee Challenge</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #fff8e1;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1) ;
+        }
+        h1 {
+            text-align: center;
+            color: #f1c40f;
+            margin-bottom: 30px;
+        }
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .word-info {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .definition {
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        .example {
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .input-container {
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .submit-btn {
+            background-color: #f1c40f;
+            color: white;
+        }
+        .submit-btn:hover {
+            background-color: #e2b607;
+        }
+        .hint-btn, .skip-btn {
+            background-color: #eee;
+            color: #333;
+        }
+        .hint-btn:hover, .skip-btn:hover {
+            background-color: #ddd;
+        }
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .correct {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .hint {
+            background-color: #cce5ff;
+            color: #004085;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .score-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+        .score, .high-score {
+            text-align: center;
+        }
+        .difficulty {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .easy {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .medium {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .hard {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .game-modes {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .mode-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            width: 200px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .mode-card:hover {
+            transform: translateY(-5px);
+        }
+        .mode-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        .results {
+            text-align: center;
+        }
+        .results h2 {
+            margin-bottom: 20px;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .result-item {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .result-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #f1c40f;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #eee;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        .progress {
+            height: 100%;
+            background-color: #f1c40f;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Spelling Bee Challenge</h1>
+        
+        <!-- Home Screen -->
+        <div id="home-screen">
+            <p class="text-center">Test your spelling skills with fun challenges!</p>
+            
+            <div class="game-modes">
+                <div class="mode-card" onclick="startGame('practice')">
+                    <div class="mode-icon">📚</div>
+                    <h3>Practice Mode</h3>
+                    <p>Practice spelling without time pressure.</p>
+                </div>
+                
+                <div class="mode-card" onclick="startGame('challenge')">
+                    <div class="mode-icon">⏱️</div>
+                    <h3>Challenge Mode</h3>
+                    <p>Test your skills with a 60-second time limit.</p>
+                </div>
+                
+                <div class="mode-card" onclick="startGame('competition')">
+                    <div class="mode-icon">🏆</div>
+                    <h3>Competition Mode</h3>
+                    <p>Compete for high scores in this 3-minute challenge.</p>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <h2>How to Play</h2>
+                <ol style="display: inline-block; text-align: left;">
+                    <li>Select a game mode</li>
+                    <li>Listen to the word pronunciation (optional)</li>
+                    <li>Type the correct spelling in the input field</li>
+                    <li>Submit your answer or skip to the next word</li>
+                    <li>Use hints if you need help with difficult words</li>
+                    <li>Try to achieve the highest score possible!</li>
+                </ol>
+            </div>
+        </div>
+        
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden">
+            <div class="score-container">
+                <div class="score">
+                    <p>Score</p>
+                    <p id="score">0</p>
+                </div>
+                
+                <div class="high-score">
+                    <p>High Score</p>
+                    <p id="high-score">0</p>
+                </div>
+                
+                <div id="timer-container" class="hidden">
+                    <p>Time</p>
+                    <p id="timer">0:00</p>
+                </div>
+            </div>
+            
+            <div class="game-container">
+                <div class="word-info">
+                    <span id="difficulty" class="difficulty">Medium</span>
+                    <button id="pronounce-btn" class="hint-btn">🔊 Pronounce</button>
+                    
+                    <div class="definition" id="definition">
+                        The state of being happy.
+                    </div>
+                    
+                    <div class="example" id="example">
+                        "She couldn't hide her happiness when she received the good news."
+                    </div>
+                    
+                    <div id="hint-container" class="hint hidden">
+                        <p><strong>Hint:</strong> <span id="hint-text">hap-ee-nis</span></p>
+                    </div>
+                </div>
+                
+                <div class="input-container">
+                    <input type="text" id="answer-input" placeholder="Type the correct spelling...">
+                </div>
+                
+                <div class="buttons">
+                    <button id="submit-btn" class="submit-btn">Submit</button>
+                    <button id="skip-btn" class="skip-btn">Skip</button>
+                    <button id="hint-btn" class="hint-btn">Hint</button>
+                </div>
+                
+                <div id="feedback" class="feedback hidden"></div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button id="end-game-btn" class="hint-btn">End Game</button>
+            </div>
+        </div>
+        
+        <!-- Results Screen -->
+        <div id="results-screen" class="hidden results">
+            <h2>Game Over!</h2>
+            <p id="performance-message">Great job! Your spelling skills are impressive!</p>
+            
+            <div class="results-grid">
+                <div class="result-item">
+                    <p>Final Score</p>
+                    <p id="final-score" class="result-value">0</p>
+                </div>
+                
+                <div class="result-item">
+                    <p>High Score</p>
+                    <p id="results-high-score" class="result-value">0</p>
+                </div>
+                
+                <div class="result-item">
+                    <p>Words Attempted</p>
+                    <p id="words-attempted" class="result-value">0</p>
+                </div>
+                
+                <div class="result-item">
+                    <p>Words Correct</p>
+                    <p id="words-correct" class="result-value">0</p>
+                </div>
+            </div>
+            
+            <div>
+                <p>Accuracy</p>
+                <div class="progress-bar">
+                    <div id="accuracy-bar" class="progress" style="width: 75%;"></div>
+                </div>
+                <p id="accuracy-value">75%</p>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <button id="play-again-btn" class="submit-btn">Play Again</button>
+                <button id="return-home-btn" class="hint-btn" style="margin-left: 10px;">Return to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Word database
+        const words = [
+            {
+                word: "accommodate",
+                pronunciation: "uh-kom-uh-deyt",
+                definition: "to provide with a place to live or to be stored in",
+                example: "The hotel can accommodate up to 500 guests.",
+                difficulty: "hard"
+            },
+            {
+                word: "necessary",
+                pronunciation: "nes-uh-ser-ee",
+                definition: "being essential, indispensable, or requisite",
+                example: "It's necessary to bring your passport when traveling internationally.",
+                difficulty: "medium"
+            },
+            {
+                word: "rhythm",
+                pronunciation: "rith-uhm",
+                definition: "a strong, regular, repeated pattern of movement or sound",
+                example: "The drummer kept a steady rhythm throughout the song.",
+                difficulty: "hard"
+            },
+            {
+                word: "beautiful",
+                pronunciation: "byoo-tuh-fuhl",
+                definition: "having qualities that give great pleasure or satisfaction to see, hear, think about, etc.",
+                example: "The sunset over the ocean was beautiful.",
+                difficulty: "medium"
+            },
+            {
+                word: "receive",
+                pronunciation: "ri-seev",
+                definition: "to take or get something that is given, paid, or sent",
+                example: "Did you receive my email yesterday?",
+                difficulty: "medium"
+            },
+            {
+                word: "apple",
+                pronunciation: "ap-uhl",
+                definition: "a round fruit with red, yellow, or green skin and a white inside",
+                example: "An apple a day keeps the doctor away.",
+                difficulty: "easy"
+            },
+            {
+                word: "house",
+                pronunciation: "hous",
+                definition: "a building for human habitation",
+                example: "They bought a new house in the suburbs.",
+                difficulty: "easy"
+            },
+            {
+                word: "friend",
+                pronunciation: "frend",
+                definition: "a person whom one knows and with whom one has a bond of mutual affection",
+                example: "She's been my best friend since kindergarten.",
+                difficulty: "easy"
+            },
+            {
+                word: "conscience",
+                pronunciation: "kon-shuhns",
+                definition: "the inner sense of what is right or wrong in one's conduct or motives",
+                example: "His conscience wouldn't let him tell a lie.",
+                difficulty: "hard"
+            },
+            {
+                word: "occurrence",
+                pronunciation: "uh-kur-uhns",
+                definition: "an incident or event",
+                example: "Earthquakes are a common occurrence in that region.",
+                difficulty: "hard"
+            },
+            {
+                word: "school",
+                pronunciation: "skool",
+                definition: "an institution for educating children",
+                example: "My daughter starts school next week.",
+                difficulty: "easy"
+            },
+            {
+                word: "believe",
+                pronunciation: "bih-leev",
+                definition: "to accept as true or real",
+                example: "I believe that hard work leads to success.",
+                difficulty: "medium"
+            },
+            {
+                word: "separate",
+                pronunciation: "sep-uh-reyt",
+                definition: "to keep apart or divide",
+                example: "Please separate your recycling from your trash.",
+                difficulty: "medium"
+            },
+            {
+                word: "definitely",
+                pronunciation: "def-uh-nit-lee",
+                definition: "without doubt; clearly",
+                example: "I will definitely attend the meeting tomorrow.",
+                difficulty: "medium"
+            },
+            {
+                word: "embarrassment",
+                pronunciation: "em-bar-uhs-muhnt",
+                definition: "a feeling of self-consciousness, shame, or awkwardness",
+                example: "His face turned red with embarrassment.",
+                difficulty: "hard"
+            }
+        ];
+
+        // Game state
+        let gameState = {
+            mode: '',
+            currentWord: null,
+            score: 0,
+            highScore: 0,
+            wordsAttempted: 0,
+            wordsCorrect: 0,
+            showHint: false,
+            gameOver: false,
+            timeRemaining: null,
+            maxTime: null
+        };
+
+        // DOM elements
+        const homeScreen = document.getElementById('home-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        const scoreElement = document.getElementById('score');
+        const highScoreElement = document.getElementById('high-score');
+        const timerContainer = document.getElementById('timer-container');
+        const timerElement = document.getElementById('timer');
+        const difficultyElement = document.getElementById('difficulty');
+        const definitionElement = document.getElementById('definition');
+        const exampleElement = document.getElementById('example');
+        const hintContainer = document.getElementById('hint-container');
+        const hintTextElement = document.getElementById('hint-text');
+        const answerInput = document.getElementById('answer-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const skipBtn = document.getElementById('skip-btn');
+        const hintBtn = document.getElementById('hint-btn');
+        const pronounceBtn = document.getElementById('pronounce-btn');
+        const feedbackElement = document.getElementById('feedback');
+        const endGameBtn = document.getElementById('end-game-btn');
+        const finalScoreElement = document.getElementById('final-score');
+        const resultsHighScoreElement = document.getElementById('results-high-score');
+        const wordsAttemptedElement = document.getElementById('words-attempted');
+        const wordsCorrectElement = document.getElementById('words-correct');
+        const accuracyBarElement = document.getElementById('accuracy-bar');
+        const accuracyValueElement = document.getElementById('accuracy-value');
+        const performanceMessageElement = document.getElementById('performance-message');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const returnHomeBtn = document.getElementById('return-home-btn');
+
+        // Timer interval
+        let timerInterval;
+
+        // Start game
+        function startGame(mode) {
+            // Filter words by difficulty based on mode
+            let filteredWords = [...words];
+            
+            // Initialize game state
+            gameState = {
+                mode: mode,
+                currentWord: null,
+                score: 0,
+                highScore: localStorage.getItem('highScore') ? parseInt(localStorage.getItem('highScore')) : 0,
+                wordsAttempted: 0,
+                wordsCorrect: 0,
+                showHint: false,
+                gameOver: false,
+                timeRemaining: null,
+                maxTime: null
+            };
+            
+            // Set time limit for timed modes
+            if (mode === 'challenge') {
+                gameState.timeRemaining = 60; // 1 minute
+                gameState.maxTime = 60;
+                timerContainer.classList.remove('hidden');
+            } else if (mode === 'competition') {
+                gameState.timeRemaining = 180; // 3 minutes
+                gameState.maxTime = 180;
+                timerContainer.classList.remove('hidden');
+            } else {
+                timerContainer.classList.add('hidden');
+            }
+            
+            // Update UI
+            updateScoreDisplay();
+            
+            // Get first word
+            getNextWord();
+            
+            // Start timer if needed
+            if (gameState.timeRemaining) {
+                startTimer();
+            }
+            
+            // Show game screen
+            homeScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            resultsScreen.classList.add('hidden');
+            
+            // Focus on input
+            answerInput.focus();
+        }
+
+        // Get next word
+        function getNextWord() {
+            // Reset feedback and hint
+            feedbackElement.classList.add('hidden');
+            hintContainer.classList.add('hidden');
+            gameState.showHint = false;
+            
+            // Get random word different from current
+            let filteredWords = words.filter(word => {
+                return !gameState.currentWord || word.word !== gameState.currentWord.word;
+            });
+            
+            if (filteredWords.length === 0) {
+                filteredWords = words; // If all words used, reset
+            }
+            
+            const randomIndex = Math.floor(Math.random() * filteredWords.length);
+            gameState.currentWord = filteredWords[randomIndex];
+            
+            // Update UI
+            difficultyElement.textContent = gameState.currentWord.difficulty.charAt(0).toUpperCase() + gameState.currentWord.difficulty.slice(1);
+            difficultyElement.className = 'difficulty ' + gameState.currentWord.difficulty;
+            definitionElement.textContent = gameState.currentWord.definition;
+            exampleElement.textContent = gameState.currentWord.example;
+            hintTextElement.textContent = gameState.currentWord.pronunciation;
+            
+            // Clear input
+            answerInput.value = '';
+            answerInput.focus();
+        }
+
+        // Check answer
+        function checkAnswer() {
+            const answer = answerInput.value.trim().toLowerCase();
+            
+            if (!answer) return;
+            
+            gameState.wordsAttempted++;
+            
+            const isCorrect = answer === gameState.currentWord.word.toLowerCase();
+            
+            if (isCorrect) {
+                gameState.wordsCorrect++;
+                
+                // Calculate score based on difficulty and time
+                let scoreForWord = 0;
+                if (gameState.currentWord.difficulty === 'easy') scoreForWord = 10;
+                else if (gameState.currentWord.difficulty === 'medium') scoreForWord = 20;
+                else if (gameState.currentWord.difficulty === 'hard') scoreForWord = 30;
+                
+                // Add time bonus for timed modes
+                if (gameState.timeRemaining && gameState.maxTime) {
+                    const timeBonus = Math.floor((gameState.timeRemaining / gameState.maxTime) * 10);
+                    scoreForWord += timeBonus;
+                }
+                
+                gameState.score += scoreForWord;
+                
+                // Update high score if needed
+                if (gameState.score > gameState.highScore) {
+                    gameState.highScore = gameState.score;
+                    localStorage.setItem('highScore', gameState.highScore);
+                }
+                
+                // Show feedback
+                feedbackElement.textContent = 'Correct! Well done.';
+                feedbackElement.className = 'feedback correct';
+                
+                // Add confetti effect
+                createConfetti();
+            } else {
+                // Show feedback
+                feedbackElement.textContent = `Incorrect. The correct spelling is "${gameState.currentWord.word}".`;
+                feedbackElement.className = 'feedback incorrect';
+            }
+            
+            feedbackElement.classList.remove('hidden');
+            updateScoreDisplay();
+            
+            // Wait before moving to next word
+            setTimeout(() => {
+                if (!gameState.gameOver) {
+                    getNextWord();
+                }
+            }, 2000);
+        }
+
+        // Toggle hint
+        function toggleHint() {
+            gameState.showHint = !gameState.showHint;
+            
+            if (gameState.showHint) {
+                hintContainer.classList.remove('hidden');
+            } else {
+                hintContainer.classList.add('hidden');
+            }
+        }
+
+        // Start timer
+        function startTimer() {
+            clearInterval(timerInterval);
+            
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                gameState.timeRemaining--;
+                updateTimerDisplay();
+                
+                if (gameState.timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(gameState.timeRemaining / 60);
+            const seconds = gameState.timeRemaining % 60;
+            timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
+        // Update score display
+        function updateScoreDisplay() {
+            scoreElement.textContent = gameState.score;
+            highScoreElement.textContent = gameState.highScore;
+        }
+
+        // End game
+        function endGame() {
+            gameState.gameOver = true;
+            clearInterval(timerInterval);
+            
+            // Update results screen
+            finalScoreElement.textContent = gameState.score;
+            resultsHighScoreElement.textContent = gameState.highScore;
+            wordsAttemptedElement.textContent = gameState.wordsAttempted;
+            wordsCorrectElement.textContent = gameState.wordsCorrect;
+            
+            // Calculate accuracy
+            const accuracy = gameState.wordsAttempted > 0 
+                ? Math.round((gameState.wordsCorrect / gameState.wordsAttempted) * 100) 
+                : 0;
+            
+            accuracyBarElement.style.width = `${accuracy}%`;
+            accuracyValueElement.textContent = `${accuracy}%`;
+            
+            // Set performance message
+            if (accuracy >= 90) {
+                performanceMessageElement.textContent = "Outstanding! You're a spelling champion!";
+            } else if (accuracy >= 70) {
+                performanceMessageElement.textContent = "Great job! Your spelling skills are impressive!";
+            } else if (accuracy >= 50) {
+                performanceMessageElement.textContent = "Good effort! Keep practicing to improve!";
+            } else {
+                performanceMessageElement.textContent = "Nice try! Practice makes perfect!";
+            }
+            
+            // Show results screen
+            homeScreen.classList.add('hidden');
+            gameScreen.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+        }
+
+        // Pronounce word
+        function pronounceWord() {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(gameState.currentWord.word);
+                utterance.rate = 0.8; // Slightly slower for clarity
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Create confetti effect
+        function createConfetti() {
+            const confettiCount = 100;
+            const container = document.querySelector('.container');
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'absolute';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.backgroundColor = getRandomColor();
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.top = '0';
+                confetti.style.opacity = '1';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                confetti.style.transition = 'all 3s ease-out';
+                
+                container.appendChild(confetti);
+                
+                // Animate confetti
+                setTimeout(() => {
+                    confetti.style.top = '100%';
+                    confetti.style.opacity = '0';
+                    confetti.style.transform = `rotate(${Math.random() * 360 + 360}deg)`;
+                }, 10);
+                
+                // Remove confetti after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 3000);
+            }
+        }
+
+        // Get random color
+        function getRandomColor() {
+            const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#e67e22'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // Event listeners
+        submitBtn.addEventListener('click', checkAnswer);
+        answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+        
+        skipBtn.addEventListener('click', getNextWord);
+        hintBtn.addEventListener('click', toggleHint);
+        pronounceBtn.addEventListener('click', pronounceWord);
+        endGameBtn.addEventListener('click', endGame);
+        
+        playAgainBtn.addEventListener('click', () => {
+            startGame(gameState.mode);
+        });
+        
+        returnHomeBtn.addEventListener('click', () => {
+            homeScreen.classList.remove('hidden');
+            gameScreen.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+        });
+    </script>
+</body>
+</html>
